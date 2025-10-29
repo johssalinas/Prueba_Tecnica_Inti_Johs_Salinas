@@ -40,7 +40,12 @@ cd Prueba_Tecnica_Inti_Johs_Salinas
 docker-compose up --build
 ```
 
-3. **Acceder a las aplicaciones**
+3. **Esperar a que los servicios estén listos**
+   - MySQL iniciará primero y ejecutará `db/schema.sql`
+   - Backend esperará a que MySQL esté saludable
+   - Frontend se construirá y servirá con Nginx
+
+4. **Acceder a las aplicaciones**
    - Backend: http://localhost:8080
    - Frontend: http://localhost:4200
 
