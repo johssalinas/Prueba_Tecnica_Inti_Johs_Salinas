@@ -1,0 +1,120 @@
+<div class="container">
+  <header class="header">
+    <h1>Sistema de Inventario</h1>
+    <div class="user-info">
+      <span>Bienvenido, {{ username }}</span>
+      <button (click)="logout()" class="btn-logout">Cerrar Sesión</button>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <button (click)="router.navigate(['/productos/new'])" class="btn-primary">
+      + Nuevo Producto
+    </button>
+    <button (click)="syncProducts()" class="btn-sync">
+      🔄 Sincronizar desde API
+    </button>
+  </div>
+
+  <div class="filters">
+    <form [formGroup]="filterForm">
+      <div class="filter-group">
+        <input
+          type="text"
+          formControlName="search"
+          placeholder="Buscar por nombre..."
+          class="form-control"
+        />
+        <input
+          type="text"
+          formControlName="categoria"
+          placeholder="Filtrar por categoría..."
+          class="form-control"
+        />
+        <select formControlName="size" class="form-control">
+          <option value="10">10 por página</option>
+          <option value="20">20 por página</option>
+          <option value="50">50 por página</option>
+        </select>
+      </div>
+    </form>
+  </div>
+
+  <div class="error-message" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="loading" *ngIf="isLoading">
+    Cargando productos...
+  </div>
+
+  <div class="table-container" *ngIf="!isLoading && productos.length > 0">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Categoría</th>
+          <th>Proveedor</th>
+          <th>Precio</th>
+          <th>Stock</th>
+          <th>Fecha Registro</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let producto of productos">
+          <td>{{ producto.id }}</td>
+          <td>{{ producto.nombre }}</td>
+          <td>{{ producto.categoria }}</td>
+          <td>{{ producto.proveedor }}</td>
+          <td>{{ producto.precio | currency }}</td>
+          <td>
+            <span [class.low-stock]="producto.stock < 10">
+              {{ producto.stock }}
+            </span>
+          </td>
+          <td>{{ producto.fechaRegistro | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td class="actions">
+            <button (click)="onEdit(producto.id)" class="btn-edit" title="Editar">
+              ✏️
+            </button>
+            <button (click)="onStockMovement(producto.id)" class="btn-stock" title="Movimiento de Stock">
+              📦
+            </button>
+            <button (click)="onDelete(producto.id, producto.nombre)" class="btn-delete" title="Eliminar">
+              🗑️
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="empty-state" *ngIf="!isLoading && productos.length === 0">
+    <p>No se encontraron productos</p>
+  </div>
+
+  <div class="pagination" *ngIf="pageResponse && pageResponse.totalPages > 1">
+    <button 
+      (click)="onPageChange(pageResponse.pageNumber - 1)"
+      [disabled]="pageResponse.first"
+      class="btn-page"
+    >
+      Anterior
+    </button>
+    
+    <span class="page-info">
+      Página {{ pageResponse.pageNumber + 1 }} de {{ pageResponse.totalPages }}
+      ({{ pageResponse.totalElements }} productos)
+    </span>
+    
+    <button 
+      (click)="onPageChange(pageResponse.pageNumber + 1)"
+      [disabled]="pageResponse.last"
+      class="btn-page"
+    >
+      Siguiente
+    </button>
+  </div>
+</div>

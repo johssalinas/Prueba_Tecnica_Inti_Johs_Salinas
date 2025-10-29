@@ -1,0 +1,83 @@
+<div class="container">
+  <div class="form-card">
+    <h2>Registrar Movimiento de Stock</h2>
+
+    <div class="producto-info" *ngIf="producto">
+      <h3>Producto Seleccionado</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">Nombre:</span>
+          <span class="value">{{ producto.nombre }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Categoría:</span>
+          <span class="value">{{ producto.categoria }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Stock Actual:</span>
+          <span class="value stock-value" [class.low-stock]="producto.stock < 10">
+            {{ producto.stock }} unidades
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="label">Precio:</span>
+          <span class="value">{{ producto.precio | currency }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="success-message" *ngIf="successMessage">
+      ✓ {{ successMessage }}
+    </div>
+
+    <div class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="movementForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="tipo">Tipo de Movimiento *</label>
+        <select
+          id="tipo"
+          formControlName="tipo"
+          class="form-control"
+          [class.error]="movementForm.get('tipo')?.touched && movementForm.get('tipo')?.invalid"
+        >
+          <option value="">Seleccione un tipo</option>
+          <option [value]="tipoMovimiento.ENTRADA">Entrada (Aumentar Stock)</option>
+          <option [value]="tipoMovimiento.SALIDA">Salida (Reducir Stock)</option>
+        </select>
+        <span class="error-text" *ngIf="getErrorMessage('tipo')">
+          {{ getErrorMessage('tipo') }}
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="cantidad">Cantidad *</label>
+        <input
+          type="number"
+          id="cantidad"
+          formControlName="cantidad"
+          class="form-control"
+          min="1"
+          [class.error]="movementForm.get('cantidad')?.touched && movementForm.get('cantidad')?.invalid"
+        />
+        <span class="error-text" *ngIf="getErrorMessage('cantidad')">
+          {{ getErrorMessage('cantidad') }}
+        </span>
+        <span class="help-text">
+          Ingrese la cantidad de unidades para este movimiento
+        </span>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" (click)="onCancel()" class="btn-cancel">
+          Volver
+        </button>
+        <button type="submit" class="btn-submit" [disabled]="isLoading || movementForm.invalid">
+          {{ isLoading ? 'Registrando...' : 'Registrar Movimiento' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
