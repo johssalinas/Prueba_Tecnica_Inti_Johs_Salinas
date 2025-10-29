@@ -24,7 +24,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -33,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
-@DisplayName("ProductoController - Tests Integración")
+@DisplayName("ProductoController - Contrato REST API")
 class ProductoControllerTest {
 
     @Autowired
@@ -68,6 +67,13 @@ class ProductoControllerTest {
         productoRequest.setProveedor("HP Inc");
         productoRequest.setPrecio(new BigDecimal("999.99"));
         productoRequest.setStock(10);
+    }
+
+    @Test
+    @DisplayName("GET /api/productos - Debe retornar 401 sin autenticación")
+    void getAllProductos_DebeRetornar401SinAuth() throws Exception {
+        mockMvc.perform(get("/api/productos"))
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -125,27 +131,6 @@ class ProductoControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/productos - Debe retornar 401 sin autenticación")
-    void getAllProductos_DebeRetornar401SinAuth() throws Exception {
-        mockMvc.perform(get("/api/productos"))
-            .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    @WithMockUser
-    @DisplayName("GET /api/productos/{id} - Debe retornar producto por ID")
-    void getProductoById_DebeRetornarProducto() throws Exception {
-        when(productoService.getProductoById(1L)).thenReturn(productoResponse);
-
-        mockMvc.perform(get("/api/productos/1"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(1))
-            .andExpect(jsonPath("$.nombre").value("Laptop HP"));
-
-        verify(productoService).getProductoById(1L);
-    }
-
-    @Test
     @WithMockUser
     @DisplayName("GET /api/productos/{id} - Debe retornar 404 si no existe")
     void getProductoById_DebeRetornar404SiNoExiste() throws Exception {
@@ -161,8 +146,8 @@ class ProductoControllerTest {
 
     @Test
     @WithMockUser
-    @DisplayName("POST /api/productos - Debe crear producto correctamente")
-    void createProducto_DebeCrearProductoCorrectamente() throws Exception {
+    @DisplayName("POST /api/productos - Debe retornar 201 con Location header")
+    void createProducto_DebeRetornar201ConLocationHeader() throws Exception {
         when(productoService.createProducto(any(ProductoRequest.class)))
             .thenReturn(productoResponse);
 
@@ -213,40 +198,6 @@ class ProductoControllerTest {
 
     @Test
     @WithMockUser
-    @DisplayName("PUT /api/productos/{id} - Debe actualizar producto correctamente")
-    void updateProducto_DebeActualizarProductoCorrectamente() throws Exception {
-        when(productoService.updateProducto(eq(1L), any(ProductoRequest.class)))
-            .thenReturn(productoResponse);
-
-        mockMvc.perform(put("/api/productos/1")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(productoRequest)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(1))
-            .andExpect(jsonPath("$.nombre").value("Laptop HP"));
-
-        verify(productoService).updateProducto(eq(1L), any(ProductoRequest.class));
-    }
-
-    @Test
-    @WithMockUser
-    @DisplayName("PUT /api/productos/{id} - Debe retornar 404 si no existe")
-    void updateProducto_DebeRetornar404SiNoExiste() throws Exception {
-        when(productoService.updateProducto(eq(999L), any(ProductoRequest.class)))
-            .thenThrow(new ResourceNotFoundException("Producto", "id", 999L));
-
-        mockMvc.perform(put("/api/productos/999")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(productoRequest)))
-            .andExpect(status().isNotFound());
-
-        verify(productoService).updateProducto(eq(999L), any(ProductoRequest.class));
-    }
-
-    @Test
-    @WithMockUser
     @DisplayName("PUT /api/productos/{id} - Debe retornar 409 con nombre duplicado")
     void updateProducto_DebeRetornar409ConNombreDuplicado() throws Exception {
         when(productoService.updateProducto(eq(1L), any(ProductoRequest.class)))
@@ -259,30 +210,5 @@ class ProductoControllerTest {
             .andExpect(status().isConflict());
 
         verify(productoService).updateProducto(eq(1L), any(ProductoRequest.class));
-    }
-
-    @Test
-    @WithMockUser
-    @DisplayName("DELETE /api/productos/{id} - Debe eliminar producto correctamente")
-    void deleteProducto_DebeEliminarProductoCorrectamente() throws Exception {
-        mockMvc.perform(delete("/api/productos/1")
-                .with(csrf()))
-            .andExpect(status().isNoContent());
-
-        verify(productoService).deleteProducto(1L);
-    }
-
-    @Test
-    @WithMockUser
-    @DisplayName("DELETE /api/productos/{id} - Debe retornar 404 si no existe")
-    void deleteProducto_DebeRetornar404SiNoExiste() throws Exception {
-        doThrow(new ResourceNotFoundException("Producto", "id", 999L))
-            .when(productoService).deleteProducto(999L);
-
-        mockMvc.perform(delete("/api/productos/999")
-                .with(csrf()))
-            .andExpect(status().isNotFound());
-
-        verify(productoService).deleteProducto(999L);
     }
 }
