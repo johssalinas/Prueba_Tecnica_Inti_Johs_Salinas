@@ -26,7 +26,7 @@ services:
       - "8080:8080"
     environment:
       SERVER_PORT: 8080
-      DB_URL: jdbc:mysql://localhost:3306/inventario_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true&cachePrepStmts=true&useServerPrepStmts=true
+      DB_URL: jdbc:mysql://mysql:3306/inventario_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true&cachePrepStmts=true&useServerPrepStmts=true
       DB_USERNAME: root
       DB_PASSWORD: root
       JWT_SECRET: miSecretoSuperSeguroParaJWT2024InventarioSystemSecretKey12345
