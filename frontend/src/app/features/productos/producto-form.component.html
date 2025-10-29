@@ -1,0 +1,97 @@
+<div class="container">
+  <div class="form-card">
+    <h2>{{ isEditMode ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
+
+    <div class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="productoForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="nombre">Nombre *</label>
+        <input
+          type="text"
+          id="nombre"
+          formControlName="nombre"
+          class="form-control"
+          [class.error]="productoForm.get('nombre')?.touched && productoForm.get('nombre')?.invalid"
+        />
+        <span class="error-text" *ngIf="getErrorMessage('nombre')">
+          {{ getErrorMessage('nombre') }}
+        </span>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="categoria">Categoría *</label>
+          <input
+            type="text"
+            id="categoria"
+            formControlName="categoria"
+            class="form-control"
+            [class.error]="productoForm.get('categoria')?.touched && productoForm.get('categoria')?.invalid"
+          />
+          <span class="error-text" *ngIf="getErrorMessage('categoria')">
+            {{ getErrorMessage('categoria') }}
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="proveedor">Proveedor *</label>
+          <input
+            type="text"
+            id="proveedor"
+            formControlName="proveedor"
+            class="form-control"
+            [class.error]="productoForm.get('proveedor')?.touched && productoForm.get('proveedor')?.invalid"
+          />
+          <span class="error-text" *ngIf="getErrorMessage('proveedor')">
+            {{ getErrorMessage('proveedor') }}
+          </span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="precio">Precio *</label>
+          <input
+            type="number"
+            id="precio"
+            formControlName="precio"
+            class="form-control"
+            step="0.01"
+            min="0"
+            [class.error]="productoForm.get('precio')?.touched && productoForm.get('precio')?.invalid"
+          />
+          <span class="error-text" *ngIf="getErrorMessage('precio')">
+            {{ getErrorMessage('precio') }}
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="stock">Stock *</label>
+          <input
+            type="number"
+            id="stock"
+            formControlName="stock"
+            class="form-control"
+            min="0"
+            [class.error]="productoForm.get('stock')?.touched && productoForm.get('stock')?.invalid"
+          />
+          <span class="error-text" *ngIf="getErrorMessage('stock')">
+            {{ getErrorMessage('stock') }}
+          </span>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" (click)="onCancel()" class="btn-cancel">
+          Cancelar
+        </button>
+        <button type="submit" class="btn-submit" [disabled]="isLoading || productoForm.invalid">
+          {{ isLoading ? 'Guardando...' : (isEditMode ? 'Actualizar' : 'Crear') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
