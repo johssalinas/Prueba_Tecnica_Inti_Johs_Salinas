@@ -12,7 +12,7 @@
       + Nuevo Producto
     </button>
     <button (click)="syncProducts()" class="btn-sync">
-      🔄 Sincronizar desde API
+      Sincronizar desde API
     </button>
   </div>
 
@@ -32,9 +32,9 @@
           class="form-control"
         />
         <select formControlName="size" class="form-control">
-          <option value="10">10 por página</option>
-          <option value="20">20 por página</option>
-          <option value="50">50 por página</option>
+          <option [value]="10">10 por página</option>
+          <option [value]="20">20 por página</option>
+          <option [value]="50">50 por página</option>
         </select>
       </div>
     </form>

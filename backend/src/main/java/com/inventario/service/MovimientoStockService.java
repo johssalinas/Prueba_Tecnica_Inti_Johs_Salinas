@@ -57,7 +57,7 @@ public class MovimientoStockService {
                      sanitizeForLog(producto.getId()), stockActual, nuevoStock);
         }
         
-        return MovimientoStockResponse.fromEntity(savedMovimiento, producto.getNombre(), nuevoStock);
+        return MovimientoStockResponse.fromEntity(savedMovimiento, producto.getNombre(), stockActual, nuevoStock);
     }
     
     private void validateRequest(MovimientoStockRequest request) {

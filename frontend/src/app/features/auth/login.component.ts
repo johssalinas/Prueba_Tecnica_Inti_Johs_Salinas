@@ -15,6 +15,7 @@ export class LoginComponent {
   loginForm: FormGroup;
   errorMessage: string = '';
   isLoading: boolean = false;
+  showPassword: boolean = false;
 
   constructor(
     private readonly fb: FormBuilder,
@@ -45,6 +46,10 @@ export class LoginComponent {
         this.errorMessage = error.error?.message || 'Usuario o contraseña incorrectos';
       }
     });
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
   }
 
   getErrorMessage(field: string): string {

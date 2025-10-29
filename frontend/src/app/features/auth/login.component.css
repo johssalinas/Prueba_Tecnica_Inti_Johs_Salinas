@@ -39,6 +39,12 @@ label {
   font-weight: 500;
 }
 
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
 .form-control {
   width: 100%;
   padding: 12px;
@@ -47,6 +53,28 @@ label {
   font-size: 14px;
   transition: all 0.3s;
   box-sizing: border-box;
+}
+
+.password-input-container .form-control {
+  padding-right: 45px;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+
+.toggle-password:hover {
+  transform: scale(1.1);
 }
 
 .form-control:focus {

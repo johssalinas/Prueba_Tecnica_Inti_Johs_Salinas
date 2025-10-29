@@ -20,13 +20,23 @@
 
       <div class="form-group">
         <label for="password">Contraseña</label>
-        <input
-          type="password"
-          id="password"
-          formControlName="password"
-          class="form-control"
-          [class.error]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"
-        />
+        <div class="password-input-container">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="password"
+            formControlName="password"
+            class="form-control"
+            [class.error]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"
+          />
+          <button 
+            type="button" 
+            class="toggle-password" 
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+          >
+            {{ showPassword ? '🙈' : '👁️' }}
+          </button>
+        </div>
         <span class="error-message" *ngIf="getErrorMessage('password')">
           {{ getErrorMessage('password') }}
         </span>

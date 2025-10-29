@@ -22,8 +22,10 @@ public class MovimientoStockResponse {
     private LocalDateTime fecha;
     private Long usuarioId;
     private Integer stockResultante;
+    private Integer stockAnterior;
+    private Integer stockNuevo;
     
-    public static MovimientoStockResponse fromEntity(MovimientoStock movimiento, String productoNombre, Integer stockResultante) {
+    public static MovimientoStockResponse fromEntity(MovimientoStock movimiento, String productoNombre, Integer stockAnterior, Integer stockNuevo) {
         return MovimientoStockResponse.builder()
                 .id(movimiento.getId())
                 .productoId(movimiento.getProductoId())
@@ -32,7 +34,9 @@ public class MovimientoStockResponse {
                 .cantidad(movimiento.getCantidad())
                 .fecha(movimiento.getFecha())
                 .usuarioId(movimiento.getUsuarioId())
-                .stockResultante(stockResultante)
+                .stockResultante(stockNuevo)
+                .stockAnterior(stockAnterior)
+                .stockNuevo(stockNuevo)
                 .build();
     }
 }

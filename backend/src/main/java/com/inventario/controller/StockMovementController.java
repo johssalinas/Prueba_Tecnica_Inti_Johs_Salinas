@@ -23,7 +23,7 @@ public class StockMovementController {
     private final MovimientoStockService movimientoStockService;
     
     @PostMapping
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MovimientoStockResponse> registrarMovimiento(
             @Valid @RequestBody MovimientoStockRequest request) {
         

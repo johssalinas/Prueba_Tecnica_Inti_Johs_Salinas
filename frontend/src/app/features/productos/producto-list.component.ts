@@ -47,8 +47,17 @@ export class ProductoListComponent implements OnInit {
       )
       .subscribe(() => this.loadProductos());
 
-    this.filterForm.get('categoria')?.valueChanges.subscribe(() => this.loadProductos());
-    this.filterForm.get('size')?.valueChanges.subscribe(() => this.loadProductos());
+    // Categoría también con debounce
+    this.filterForm.get('categoria')?.valueChanges
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged()
+      )
+      .subscribe(() => this.loadProductos());
+
+    this.filterForm.get('size')?.valueChanges.subscribe(() => {
+      setTimeout(() => this.loadProductos(0), 0);
+    });
   }
 
   loadProductos(page: number = 0): void {
@@ -56,8 +65,9 @@ export class ProductoListComponent implements OnInit {
     this.errorMessage = '';
 
     const { search, categoria, size } = this.filterForm.value;
+    const pageSize = Number(size) || 10;
 
-    this.productoService.getProductos(search, categoria, page, size).subscribe({
+    this.productoService.getProductos(search, categoria, page, pageSize).subscribe({
       next: (response) => {
         this.pageResponse = response;
         this.productos = response.content;
@@ -98,21 +108,18 @@ export class ProductoListComponent implements OnInit {
   }
 
   syncProducts(): void {
-    if (confirm('¿Deseas sincronizar los productos desde la API externa? Esto puede tomar unos segundos.')) {
-      this.isLoading = true;
-      this.errorMessage = '';
-      
-      this.productoService.syncProducts().subscribe({
-        next: (response) => {
-          alert('Productos sincronizados exitosamente');
-          this.loadProductos(0);
-        },
-        error: (error) => {
-          this.errorMessage = error.error?.message || 'Error al sincronizar productos';
-          this.isLoading = false;
-        }
-      });
-    }
+    this.isLoading = true;
+    this.errorMessage = '';
+    
+    this.productoService.syncProducts().subscribe({
+      next: (response) => {
+        this.loadProductos(0);
+      },
+      error: (error) => {
+        this.errorMessage = error.error?.message || 'Error al sincronizar productos';
+        this.isLoading = false;
+      }
+    });
   }
 
   logout(): void {

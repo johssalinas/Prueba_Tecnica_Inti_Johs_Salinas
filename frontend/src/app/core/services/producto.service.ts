@@ -26,11 +26,14 @@ export class ProductoService {
       .set('sortBy', sortBy)
       .set('sortDir', sortDir);
 
-    if (search) {
-      params = params.set('search', search);
+    const searchTrimmed = search?.trim();
+    const categoriaTrimmed = categoria?.trim();
+
+    if (searchTrimmed) {
+      params = params.set('search', searchTrimmed);
     }
-    if (categoria) {
-      params = params.set('categoria', categoria);
+    if (categoriaTrimmed) {
+      params = params.set('categoria', categoriaTrimmed);
     }
 
     return this.http.get<PageResponse<Producto>>(this.apiUrl, { params });
