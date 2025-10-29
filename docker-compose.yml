@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: inventario-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: inventario_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - mysql_data:/var/lib/mysql
+    networks:
+      - inventario-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: inventario-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/inventario_db?useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - inventario-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: inventario-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+    networks:
+      - inventario-network
+
+volumes:
+  mysql_data:
+
+networks:
+  inventario-network:
+    driver: bridge
