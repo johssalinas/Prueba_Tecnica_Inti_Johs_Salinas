@@ -44,6 +44,10 @@ public class Producto {
     @Column(nullable = false)
     private Integer stock = 0;
     
+    @Version
+    @Column(name = "version")
+    private Integer version;
+    
     @CreationTimestamp
     @Column(name = "fecha_registro", nullable = false, updatable = false)
     private LocalDateTime fechaRegistro;
