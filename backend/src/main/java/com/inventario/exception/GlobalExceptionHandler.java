@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import jakarta.persistence.OptimisticLockException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,14 +44,21 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
+    public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> fieldErrors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
+            fieldErrors.put(fieldName, errorMessage);
         });
-        return ResponseEntity.badRequest().body(errors);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Errores de validación");
+        response.put("errors", fieldErrors);
+        response.put("status", HttpStatus.BAD_REQUEST.value());
+        response.put("timestamp", LocalDateTime.now());
+        
+        return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -81,11 +90,34 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse(message, HttpStatus.CONFLICT.value(), LocalDateTime.now()));
     }
 
+    @ExceptionHandler({OptimisticLockException.class, ObjectOptimisticLockingFailureException.class})
+    public ResponseEntity<ErrorResponse> handleOptimisticLock(Exception ex) {
+        log.warn("Optimistic locking failure: {}", sanitizeLogMessage(ex.getMessage()));
+        String message = "Recurso modificado concurrentemente (conflicto de concurrencia). Intente la operación de nuevo.";
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse(message, HttpStatus.CONFLICT.value(), LocalDateTime.now()));
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
-        log.warn("Illegal argument: {}", ex.getMessage());
+        String sanitizedMessage = sanitizeLogMessage(ex.getMessage());
+        log.warn("Illegal argument: {}", sanitizedMessage);
         return ResponseEntity.badRequest()
                 .body(new ErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value(), LocalDateTime.now()));
+    }
+
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<ErrorResponse> handleNullPointer(NullPointerException ex) {
+        log.error("Null pointer exception: ", ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse("Error interno: valor nulo inesperado", HttpStatus.INTERNAL_SERVER_ERROR.value(), LocalDateTime.now()));
+    }
+
+    @ExceptionHandler(ArithmeticException.class)
+    public ResponseEntity<ErrorResponse> handleArithmeticException(ArithmeticException ex) {
+        log.error("Arithmetic exception: ", ex);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse("Error en operación aritmética", HttpStatus.BAD_REQUEST.value(), LocalDateTime.now()));
     }
 
     @ExceptionHandler(Exception.class)
@@ -93,6 +125,14 @@ public class GlobalExceptionHandler {
         log.error("Unexpected error: ", ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse("Error interno del servidor", HttpStatus.INTERNAL_SERVER_ERROR.value(), LocalDateTime.now()));
+    }
+
+    private String sanitizeLogMessage(String message) {
+        if (message == null) {
+            return "null";
+        }
+        return message.replaceAll("[\n\r\t]", "_")
+                      .replaceAll("[<>\"']", "");
     }
 
     public record ErrorResponse(String message, int status, LocalDateTime timestamp) {}

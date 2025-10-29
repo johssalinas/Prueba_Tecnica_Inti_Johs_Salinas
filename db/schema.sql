@@ -22,6 +22,7 @@ CREATE TABLE productos (
     precio DECIMAL(10, 2) NOT NULL,
     stock INT NOT NULL DEFAULT 0,
     fecha_registro TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    version BIGINT NOT NULL DEFAULT 0,
     CONSTRAINT uq_productos_nombre UNIQUE (nombre),
     CONSTRAINT chk_precio_positivo CHECK (precio >= 0),
     CONSTRAINT chk_stock_no_negativo CHECK (stock >= 0),

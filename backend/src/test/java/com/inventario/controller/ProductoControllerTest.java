@@ -175,8 +175,8 @@ class ProductoControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(productoRequest)))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.nombre").exists())
-            .andExpect(jsonPath("$.precio").exists());
+            .andExpect(jsonPath("$.errors.nombre").exists())
+            .andExpect(jsonPath("$.errors.precio").exists());
     }
 
     @Test
