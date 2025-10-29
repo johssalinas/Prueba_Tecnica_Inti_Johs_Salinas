@@ -1,9 +1,12 @@
 package com.inventario.model;
 
-import lombok.Data;
+import lombok.*;
+
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 public class MovimientoStock {
     private Long id;
     private Long productoId;

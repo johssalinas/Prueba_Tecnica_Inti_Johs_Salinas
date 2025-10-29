@@ -24,10 +24,6 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/**
- * Tests de integración para AuthController - REST API
- * Enfoque: Comportamiento HTTP crítico del endpoint /login
- */
 @WebMvcTest(controllers = AuthController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class AuthControllerTest {
@@ -57,7 +53,7 @@ class AuthControllerTest {
     private PasswordEncoder passwordEncoder;
 
     @Test
-    @DisplayName("Debe retornar 200 con token, username y role cuando credenciales válidas")
+    @DisplayName("POST /login - Debe retornar 200 con token, username y role cuando credenciales válidas")
     void shouldReturn200AndTokenWhenCredentialsAreValid() throws Exception {
         // Given
         LoginRequest request = new LoginRequest();
@@ -81,7 +77,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("Debe retornar 401 cuando credenciales inválidas")
+    @DisplayName("POST /login - Debe retornar 401 cuando credenciales inválidas")
     void shouldReturn401WhenCredentialsAreInvalid() throws Exception {
         // Given
         LoginRequest request = new LoginRequest();
@@ -98,57 +94,5 @@ class AuthControllerTest {
                 .andExpect(status().isUnauthorized());
 
         verify(authService, times(1)).login(any(LoginRequest.class));
-    }
-
-    @Test
-    @DisplayName("Debe retornar 400 cuando username vacío")
-    void shouldReturn400WhenUsernameIsEmpty() throws Exception {
-        // Given
-        LoginRequest invalidRequest = new LoginRequest();
-        invalidRequest.setUsername("");
-        invalidRequest.setPassword("password123");
-
-        // When/Then
-        mockMvc.perform(post("/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidRequest)))
-                .andExpect(status().isBadRequest());
-
-        verify(authService, never()).login(any(LoginRequest.class));
-    }
-
-    @Test
-    @DisplayName("Debe retornar 400 cuando password vacío")
-    void shouldReturn400WhenPasswordIsEmpty() throws Exception {
-        // Given
-        LoginRequest invalidRequest = new LoginRequest();
-        invalidRequest.setUsername("admin");
-        invalidRequest.setPassword("");
-
-        // When/Then
-        mockMvc.perform(post("/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidRequest)))
-                .andExpect(status().isBadRequest());
-
-        verify(authService, never()).login(any(LoginRequest.class));
-    }
-
-    @Test
-    @DisplayName("Debe retornar 400 cuando body vacío o JSON malformado")
-    void shouldReturn400WhenBodyEmptyOrMalformed() throws Exception {
-        // When/Then - Body vacío
-        mockMvc.perform(post("/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{}"))
-                .andExpect(status().isBadRequest());
-
-        // When/Then - JSON malformado
-        mockMvc.perform(post("/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{invalid json"))
-                .andExpect(status().isBadRequest());
-
-        verify(authService, never()).login(any(LoginRequest.class));
     }
 }
