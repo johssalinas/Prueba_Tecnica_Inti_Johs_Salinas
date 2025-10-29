@@ -6,6 +6,7 @@ import com.inventario.dto.ProductoRequest;
 import com.inventario.dto.ProductoResponse;
 import com.inventario.exception.DuplicateResourceException;
 import com.inventario.exception.ResourceNotFoundException;
+import com.inventario.repository.UserRepository;
 import com.inventario.service.ProductoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -43,6 +44,9 @@ class ProductoControllerTest {
 
     @MockitoBean
     private ProductoService productoService;
+
+    @MockitoBean
+    private UserRepository userRepository;
 
     private ProductoResponse productoResponse;
     private ProductoRequest productoRequest;
@@ -150,7 +154,7 @@ class ProductoControllerTest {
 
         mockMvc.perform(get("/api/productos/999"))
             .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.message").value("Producto no encontrado con id: 999"));
+            .andExpect(jsonPath("$.message").value("Producto no encontrado con id: '999'"));
 
         verify(productoService).getProductoById(999L);
     }
@@ -186,7 +190,8 @@ class ProductoControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(productoRequest)))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.message").exists());
+            .andExpect(jsonPath("$.nombre").exists())
+            .andExpect(jsonPath("$.precio").exists());
     }
 
     @Test
