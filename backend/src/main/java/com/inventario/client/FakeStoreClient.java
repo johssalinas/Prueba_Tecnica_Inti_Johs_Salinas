@@ -17,10 +17,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Cliente para consumir la API de FakeStore
- * Incluye timeouts, manejo robusto de errores y retry logic
- */
 @Slf4j
 @Component
 public class FakeStoreClient {
@@ -30,17 +26,12 @@ public class FakeStoreClient {
     
     public FakeStoreClient(RestTemplateBuilder restTemplateBuilder) {
         this.restTemplate = restTemplateBuilder
-                .setConnectTimeout(Duration.ofSeconds(5))  // Timeout de conexión
-                .setReadTimeout(Duration.ofSeconds(10))     // Timeout de lectura
+                .connectTimeout(Duration.ofSeconds(5))
+                .readTimeout(Duration.ofSeconds(10))
                 .defaultHeader(HttpHeaders.USER_AGENT, "SistemaInventario/1.0")
                 .build();
     }
     
-    /**
-     * Obtiene todos los productos desde FakeStore API
-     * Maneja diferentes tipos de errores de forma específica
-     * @return Lista de productos desde la API externa, o lista vacía en caso de error
-     */
     public List<FakeStoreProductDto> getAllProducts() {
         try {
             log.info("Consultando productos desde FakeStore API: {}", FAKE_STORE_API_URL);
@@ -65,24 +56,20 @@ public class FakeStoreClient {
             return Arrays.asList(body);
             
         } catch (HttpClientErrorException e) {
-            // Errores 4xx - problema del cliente (Bad Request, Not Found, etc.)
             log.error("Error del cliente al consumir FakeStore API [{}]: {}", 
                       e.getStatusCode(), e.getMessage());
             return Collections.emptyList();
             
         } catch (HttpServerErrorException e) {
-            // Errores 5xx - problema del servidor externo
             log.error("Error del servidor externo FakeStore API [{}]: {}", 
                       e.getStatusCode(), e.getMessage());
             return Collections.emptyList();
             
         } catch (ResourceAccessException e) {
-            // Timeout o problemas de red/conectividad
             log.error("Timeout o error de red al conectar con FakeStore API: {}", e.getMessage());
             return Collections.emptyList();
             
         } catch (RestClientException e) {
-            // Otros errores REST no categorizados
             log.error("Error inesperado al consumir FakeStore API: {}", e.getMessage(), e);
             return Collections.emptyList();
         }

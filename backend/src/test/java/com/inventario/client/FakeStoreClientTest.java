@@ -35,8 +35,8 @@ class FakeStoreClientTest {
         restTemplateBuilder = mock(RestTemplateBuilder.class);
         
         // Simular la configuración del RestTemplateBuilder
-        when(restTemplateBuilder.setConnectTimeout(any())).thenReturn(restTemplateBuilder);
-        when(restTemplateBuilder.setReadTimeout(any())).thenReturn(restTemplateBuilder);
+        when(restTemplateBuilder.connectTimeout(any())).thenReturn(restTemplateBuilder);
+        when(restTemplateBuilder.readTimeout(any())).thenReturn(restTemplateBuilder);
         when(restTemplateBuilder.defaultHeader(anyString(), anyString())).thenReturn(restTemplateBuilder);
         when(restTemplateBuilder.build()).thenReturn(restTemplate);
         

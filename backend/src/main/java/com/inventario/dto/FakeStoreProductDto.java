@@ -4,10 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-/**
- * DTO para mapear la respuesta de la API de FakeStore
- * Usa @JsonProperty para mapeo explícito y @JsonIgnoreProperties para tolerancia a cambios
- */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FakeStoreProductDto {
