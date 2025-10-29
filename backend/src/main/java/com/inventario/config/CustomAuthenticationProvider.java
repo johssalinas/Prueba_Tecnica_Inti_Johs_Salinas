@@ -31,7 +31,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
         log.debug("Attempting authentication for user: {}", username);
 
-        Usuario usuario = userRepository.findByUsername(username)
+        Usuario usuario = userRepository.findByUsernameAndActivoTrue(username)
                 .orElseThrow(() -> {
                     log.warn("Authentication failed: user '{}' not found", username);
                     return new BadCredentialsException("Credenciales inválidas");
